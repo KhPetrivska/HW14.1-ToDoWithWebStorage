@@ -3,18 +3,13 @@
 const taskForm = document.forms[0];
 const listContainer = document.querySelector(".js--todos-wrapper");
 const taskItem = document.querySelector(".todo-item");
-const deleteBtn = document.getElementsByClassName("todo-item__delete");
 
-const previousTasks = sessionStorage.getItem("TaskList");
-const taskStorage = previousTasks ? JSON.parse(previousTasks) : {};
+let taskStorage = JSON.parse(localStorage.getItem("TaskList")) || [];
 
-for (let i in taskStorage) {
-  const textCompletedPair = taskStorage[i];
-  if (i !== 0) {
-    const text = textCompletedPair["task"];
-    const completed = textCompletedPair.completed;
-    generateTaskBlock(text, completed);
-  }
+for (let i = 0; i < taskStorage.length; i++) {
+  const task = taskStorage[i].task;
+  const completed = taskStorage[i].completed;
+  generateTaskBlock(task, completed);
 }
 
 function generateTaskBlock(text, check) {
@@ -33,27 +28,25 @@ function generateTaskBlock(text, check) {
 // On form submit
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
+
   const formInput = taskForm.elements.value.value;
-  generateTaskBlock(formInput, false);
   const id = "TaskId" + Date.now() + Math.random();
-  taskStorage[id] = { task: formInput, completed: false };
+  const newTask = { id: id, task: formInput, completed: false };
+  taskStorage.push(newTask);
+  localStorage.setItem("TaskList", JSON.stringify(taskStorage));
+
+  generateTaskBlock(formInput, false);
   taskForm.elements.value.value = "";
 });
-// On delete click
 
+// On delete click
 listContainer.addEventListener("click", (event) => {
   if (event.target.classList.contains("todo-item__delete")) {
     const description = event.target.previousElementSibling.textContent;
     event.target.parentElement.remove();
 
-    for (let id in taskStorage) {
-      let innerObj = taskStorage[id];
-      let text = innerObj.task;
-      if (text === description) {
-        delete taskStorage[id];
-        return;
-      }
-    }
+    taskStorage = taskStorage.filter((task) => task.task !== description);
+    localStorage.setItem("TaskList", JSON.stringify(taskStorage));
   }
 });
 
@@ -61,27 +54,19 @@ listContainer.addEventListener("click", (event) => {
 listContainer.addEventListener("click", (event) => {
   if (event.target.type === "checkbox") {
     const itemTextContent = event.target.nextElementSibling.textContent;
-    if (event.target.checked) {
-      for (let id in taskStorage) {
-        const innerObj = taskStorage[id];
-        const text = innerObj["task"];
-        if (text === itemTextContent) innerObj.completed = true;
+    taskStorage = taskStorage.map((taskObj) => {
+      if (taskObj.task === itemTextContent) {
+        taskObj.completed = !taskObj.completed;
       }
+      return taskObj;
+    });
+
+    if (event.target.checked) {
       event.target.parentElement.classList.add("todo-item--checked");
     } else {
-      for (let id in taskStorage) {
-        const innerObj = taskStorage[id];
-        const text = innerObj["task"];
-        if (text === itemTextContent) innerObj.completed = false;
-      }
       event.target.parentElement.classList.remove("todo-item--checked");
     }
-  }
-});
 
-// On reboot
-addEventListener("beforeunload", (event) => {
-  console.log("beforeunload event triggered");
-  const taskStorageStr = JSON.stringify(taskStorage);
-  sessionStorage.setItem("TaskList", taskStorageStr);
+    localStorage.setItem("TaskList", JSON.stringify(taskStorage));
+  }
 });
