@@ -56,6 +56,7 @@ listContainer.addEventListener("click", (event) => {
     }
   }
 });
+
 // On checkbox click
 listContainer.addEventListener("click", (event) => {
   if (event.target.type === "checkbox") {
@@ -66,7 +67,6 @@ listContainer.addEventListener("click", (event) => {
         const text = innerObj["task"];
         if (text === itemTextContent) innerObj.completed = true;
       }
-
       event.target.parentElement.classList.add("todo-item--checked");
     } else {
       for (let id in taskStorage) {
