@@ -7,7 +7,7 @@ const taskItem = document.querySelector(".todo-item");
 let taskStorage = JSON.parse(localStorage.getItem("TaskList")) || [];
 
 for (let i = 0; i < taskStorage.length; i++) {
-  const  {task, completed} = taskStorage[i]
+  const { task, completed } = taskStorage[i];
   generateTaskBlock(task, completed);
 }
 
@@ -28,8 +28,9 @@ function generateTaskBlock(text, check) {
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const formInput = taskForm.elements.value.value;
-  if (formInput.trim() === '') {
-    alert('Empty input cannot be submitted')
+  if (formInput.trim() === "") {
+    alert("Empty input cannot be submitted");
+    return;
   }
   const id = "TaskId" + Date.now() + Math.random();
   const newTask = { id: id, task: formInput, completed: false };
