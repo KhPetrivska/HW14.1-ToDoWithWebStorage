@@ -7,8 +7,7 @@ const taskItem = document.querySelector(".todo-item");
 let taskStorage = JSON.parse(localStorage.getItem("TaskList")) || [];
 
 for (let i = 0; i < taskStorage.length; i++) {
-  const task = taskStorage[i].task;
-  const completed = taskStorage[i].completed;
+  const  {task, completed} = taskStorage[i]
   generateTaskBlock(task, completed);
 }
 
@@ -19,7 +18,7 @@ function generateTaskBlock(text, check) {
   newTaskItem.style.display = "";
   const checker = newTaskItem.querySelector("input");
   checker.checked = check;
-  if (check === true) {
+  if (check) {
     checker.parentElement.classList.add("todo-item--checked");
   }
   listContainer.appendChild(newTaskItem);
@@ -28,8 +27,10 @@ function generateTaskBlock(text, check) {
 // On form submit
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
-
   const formInput = taskForm.elements.value.value;
+  if (formInput.trim() === '') {
+    alert('Empty input cannot be submitted')
+  }
   const id = "TaskId" + Date.now() + Math.random();
   const newTask = { id: id, task: formInput, completed: false };
   taskStorage.push(newTask);
